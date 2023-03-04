@@ -2,15 +2,15 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>ff9bcb09-df7c-4c1b-8dab-2ffa817d5a9c</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Contoso</ProviderName>
+  <ProviderName>Sofonias</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="giphy-outlook-addin"/>
-  <Description DefaultValue="A template to get started."/>
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <DisplayName DefaultValue="Giphy"/>
+  <Description DefaultValue="Outlook Add-in for inserting GIFs into a message body."/>
+  <IconUrl DefaultValue="https://localhost:3000/assets/icon-63.png"/>
+  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-180.png"/>
+  <SupportUrl DefaultValue="https://github.com/sofi-a/giphy-outlook-addin/blob/main/README.md"/>
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://github.com/sofi-a/giphy-outlook-addin</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
@@ -43,11 +43,11 @@
       <Host xsi:type="MailHost">
         <DesktopFormFactor>
           <FunctionFile resid="Commands.Url"/>
-          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+          <ExtensionPoint xsi:type="MessageComposeCommandSurface">
             <OfficeTab id="TabDefault">
-              <Group id="msgReadGroup">
+              <Group id="msgComposeCmdGroup">
                 <Label resid="GroupLabel"/>
-                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                <Control xsi:type="Button" id="msgComposeOpenPaneButton">
                   <Label resid="TaskpaneButton.Label"/>
                   <Supertip>
                     <Title resid="TaskpaneButton.Label"/>
@@ -62,7 +62,7 @@
                     <SourceLocation resid="Taskpane.Url"/>
                   </Action>
                 </Control>
-                <Control xsi:type="Button" id="ActionButton">
+                <Control xsi:type="Button" id="msgComposeInsertRandomGIF">
                   <Label resid="ActionButton.Label"/>
                   <Supertip>
                     <Title resid="ActionButton.Label"/>
@@ -74,7 +74,7 @@
                     <bt:Image size="80" resid="Icon.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>action</FunctionName>
+                    <FunctionName>insertRandomGIF</FunctionName>
                   </Action>
                 </Control>
               </Group>
@@ -85,22 +85,22 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-18.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-36.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-81.png"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html"/>
         <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Taskpane"/>
-        <bt:String id="ActionButton.Label" DefaultValue="Perform an action"/>
+        <bt:String id="GroupLabel" DefaultValue="Giphy Add-in"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Browse GIFs"/>
+        <bt:String id="ActionButton.Label" DefaultValue="Random GIF"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying all available properties."/>
-        <bt:String id="ActionButton.Tooltip" DefaultValue="Perform an action when clicked."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying GIFs, Stickers, and Clips."/>
+        <bt:String id="ActionButton.Tooltip" DefaultValue="Inserts a random GIF inside message body."/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
