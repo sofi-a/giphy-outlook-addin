@@ -79,7 +79,7 @@ module.exports = async (env, options) => {
           },
         ],
       }),
-      new Dotenv(),
+      new Dotenv({ systemvars: true }),
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
         template: "./src/taskpane/taskpane.html",
