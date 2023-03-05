@@ -1,75 +1,77 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { DefaultButton } from "@fluentui/react";
-import Header from "./Header";
-import HeroList from "./HeroList";
-import Progress from "./Progress";
+import { Image, ImageFit, Spinner, SpinnerSize, Stack } from "@fluentui/react";
+import GIFs from "./GIFs";
+import Pagination from "./Pagination";
 
-/* global require */
+const { GIPHY_API_KEY } = process.env;
 
-export default class App extends React.Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      listItems: [],
-    };
-  }
+export default function App({ isOfficeInitialized }) {
+  const [gifs, setGifs] = useState([]);
+  const [pagination, setPagination] = useState({
+    total_count: 0,
+    count: 25,
+    offset: 0,
+  });
+  const [loading, setLoading] = useState(false);
 
-  componentDidMount() {
-    this.setState({
-      listItems: [
-        {
-          icon: "Ribbon",
-          primaryText: "Achieve more with Office integration",
-        },
-        {
-          icon: "Unlock",
-          primaryText: "Unlock features and functionality",
-        },
-        {
-          icon: "Design",
-          primaryText: "Create and visualize like a pro",
-        },
-      ],
-    });
-  }
-
-  click = async () => {
-    /**
-     * Insert your Outlook code here
-     */
+  const fetchGifs = async ({ count, offset, q, endpoint = "trending" }) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://api.giphy.com/v1/gifs/${endpoint}?api_key=${GIPHY_API_KEY}&limit=${count}&offset=${offset}${
+          endpoint === "search" ? `&q=${q}` : ""
+        }`
+      );
+      const { data, pagination } = await response.json();
+      setGifs(data);
+      setPagination(pagination);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  render() {
-    const { title, isOfficeInitialized } = this.props;
+  const next = () => {
+    setPagination((prev) => {
+      fetchGifs({ count: prev.count, offset: prev.offset + prev.count });
+      return { ...prev, offset: prev.offset + prev.count };
+    });
+    window.scrollTo(0, 0);
+  };
 
-    if (!isOfficeInitialized) {
-      return (
-        <Progress
-          title={title}
-          logo={require("./../../../assets/logo-filled.png")}
-          message="Please sideload your addin to see app body."
-        />
-      );
+  const prev = () => {
+    setPagination((prev) => {
+      fetchGifs({ count: prev.count, offset: prev.offset - prev.count });
+      return { ...prev, offset: prev.offset - prev.count };
+    });
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => {
+    if (isOfficeInitialized) {
+      fetchGifs({ count: pagination.count, offset: pagination.offset });
     }
+  }, [isOfficeInitialized]);
 
+  if (!isOfficeInitialized) {
     return (
-      <div className="ms-welcome">
-        <Header logo={require("./../../../assets/logo-filled.png")} title={this.props.title} message="Welcome" />
-        <HeroList message="Discover what Office Add-ins can do for you today!" items={this.state.listItems}>
-          <p className="ms-font-l">
-            Modify the source files, then click <b>Run</b>.
-          </p>
-          <DefaultButton className="ms-welcome__action" iconProps={{ iconName: "ChevronRight" }} onClick={this.click}>
-            Run
-          </DefaultButton>
-        </HeroList>
-      </div>
+      <Stack verticalAlign="center" style={{ height: "100vh" }}>
+        <Spinner size={SpinnerSize.large} label="Initializing Add-in" />;
+      </Stack>
     );
   }
+
+  return (
+    <Stack tokens={{ childrenGap: 20 }}>
+      <GIFs gifs={gifs} loading={loading} />
+      <Pagination pagination={pagination} next={next} prev={prev} />
+      <Image imageFit={ImageFit.contain} src={require("./../../../assets/attribution-mark.png")} />
+    </Stack>
+  );
 }
 
 App.propTypes = {
-  title: PropTypes.string,
   isOfficeInitialized: PropTypes.bool,
 };
