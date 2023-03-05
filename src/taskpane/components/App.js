@@ -84,6 +84,16 @@ export default function App({ isOfficeInitialized }) {
       (asyncResult) => {
         if (asyncResult.status === Office.AsyncResultStatus.Failed) {
           console.error(asyncResult.error.message);
+
+          const message = {
+            type: Office.MailboxEnums.ItemNotificationMessageType.ErrorMessage,
+            message: asyncResult.error.message,
+            icon: "Icon.80x80",
+            persistent: true,
+          };
+
+          // Show a notification message
+          Office.context.mailbox.item.notificationMessages.replaceAsync("action", message);
         }
       }
     );
