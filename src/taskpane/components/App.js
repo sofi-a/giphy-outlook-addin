@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Image, ImageFit, Spinner, SpinnerSize, Stack } from "@fluentui/react";
+import { Image, ImageFit, SearchBox, Spinner, SpinnerSize, Stack } from "@fluentui/react";
 import GIFs from "./GIFs";
 import Pagination from "./Pagination";
 
@@ -13,15 +13,17 @@ export default function App({ isOfficeInitialized }) {
     count: 25,
     offset: 0,
   });
+  const [endpoint, setEndpoint] = useState("trending");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchGifs = async ({ count, offset, q, endpoint = "trending" }) => {
+  const fetchGifs = async ({ count, offset, q, endpoint }) => {
     try {
       setLoading(true);
       const response = await fetch(
         `https://api.giphy.com/v1/gifs/${endpoint}?api_key=${GIPHY_API_KEY}&limit=${count}&offset=${offset}${
           endpoint === "search" ? `&q=${q}` : ""
-        }`
+        }&lang=en`
       );
       const { data, pagination } = await response.json();
       setGifs(data);
@@ -35,7 +37,12 @@ export default function App({ isOfficeInitialized }) {
 
   const next = () => {
     setPagination((prev) => {
-      fetchGifs({ count: prev.count, offset: prev.offset + prev.count });
+      fetchGifs({
+        count: prev.count,
+        offset: prev.offset + prev.count,
+        endpoint,
+        ...(searchTerm && { q: searchTerm }),
+      });
       return { ...prev, offset: prev.offset + prev.count };
     });
     window.scrollTo(0, 0);
@@ -43,15 +50,35 @@ export default function App({ isOfficeInitialized }) {
 
   const prev = () => {
     setPagination((prev) => {
-      fetchGifs({ count: prev.count, offset: prev.offset - prev.count });
+      fetchGifs({
+        count: prev.count,
+        offset: prev.offset - prev.count,
+        endpoint,
+        ...(searchTerm && { q: searchTerm }),
+      });
       return { ...prev, offset: prev.offset - prev.count };
     });
     window.scrollTo(0, 0);
   };
 
+  const onSearch = (searchTerm) => {
+    if (searchTerm) {
+      setEndpoint("search");
+      setPagination({ total_count: 0, count: 25, offset: 0 });
+      fetchGifs({ count: pagination.count, offset: 0, q: searchTerm, endpoint: "search" });
+    }
+  };
+
+  const onClear = () => {
+    setSearchTerm("");
+    setEndpoint("trending");
+    setPagination({ total_count: 0, count: 25, offset: 0 });
+    fetchGifs({ count: pagination.count, offset: 0, endpoint: "trending" });
+  };
+
   useEffect(() => {
     if (isOfficeInitialized) {
-      fetchGifs({ count: pagination.count, offset: pagination.offset });
+      fetchGifs({ count: pagination.count, offset: pagination.offset, endpoint });
     }
   }, [isOfficeInitialized]);
 
@@ -65,6 +92,17 @@ export default function App({ isOfficeInitialized }) {
 
   return (
     <Stack tokens={{ childrenGap: 20 }}>
+      <SearchBox
+        placeholder="Search"
+        underlined
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          onSearch(e.target.value);
+        }}
+        onSearch={onSearch}
+        onClear={onClear}
+      />
       <GIFs gifs={gifs} loading={loading} />
       <Pagination pagination={pagination} next={next} prev={prev} />
       <Image imageFit={ImageFit.contain} src={require("./../../../assets/attribution-mark.png")} />
