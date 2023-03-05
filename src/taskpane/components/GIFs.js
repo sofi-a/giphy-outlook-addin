@@ -2,7 +2,7 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import { FontIcon, Image, ImageFit, Link, Shimmer, ShimmerElementType, Stack, Text } from "@fluentui/react";
 
-export default function GIFs({ gifs = [], loading }) {
+export default function GIFs({ gifs = [], loading, onClick }) {
   return (
     <div className="ms-welcome__features ms-u-fadeIn500">
       <div className="ms-Grid" dir="ltr">
@@ -31,6 +31,7 @@ export default function GIFs({ gifs = [], loading }) {
                       src={gif.images.fixed_height.url}
                       height={gif.images.fixed_height.height}
                       style={{ cursor: "pointer" }}
+                      onClick={() => onClick(gif.id)}
                     />
                     {gif.user && (
                       <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 8 }}>
@@ -85,4 +86,5 @@ GIFs.propTypes = {
     })
   ),
   loading: PropTypes.bool,
+  onClick: PropTypes.func,
 };

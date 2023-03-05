@@ -76,6 +76,19 @@ export default function App({ isOfficeInitialized }) {
     fetchGifs({ count: pagination.count, offset: 0, endpoint: "trending" });
   };
 
+  const insertGif = (id) => {
+    const src = gifs.find((gif) => gif.id === id).images.original.url;
+    Office.context.mailbox.item.body.setSelectedDataAsync(
+      `<div><img src="${src}" /></div>`,
+      { coercionType: Office.CoercionType.Html },
+      (asyncResult) => {
+        if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+          console.error(asyncResult.error.message);
+        }
+      }
+    );
+  };
+
   useEffect(() => {
     if (isOfficeInitialized) {
       fetchGifs({ count: pagination.count, offset: pagination.offset, endpoint });
@@ -103,7 +116,7 @@ export default function App({ isOfficeInitialized }) {
         onSearch={onSearch}
         onClear={onClear}
       />
-      <GIFs gifs={gifs} loading={loading} />
+      <GIFs gifs={gifs} loading={loading} onClick={insertGif} />
       <Pagination pagination={pagination} next={next} prev={prev} />
       <Image imageFit={ImageFit.contain} src={require("./../../../assets/attribution-mark.png")} />
     </Stack>
